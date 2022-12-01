@@ -1,8 +1,8 @@
 """EXPLORE US BIKESHARE DATA
 Course: Programming for Data Science with Python
 Student: Eva Santamaría López
-Date: 30 Nov 2022
-Version 02
+Date: 01 Dec 2022
+Version 03
 """
 
 import time
@@ -19,7 +19,6 @@ def get_filters():
 
     """
     Asks user to specify a city, month, and day to analyze.
-
     Returns:
         (str) city - name of the city to analyze
         (str) month - name of the month to filter by, or "all" to apply no month filter
@@ -100,12 +99,56 @@ def time_stats(df):
 
     # Display the most common month
     most_common_month = df['Month'].mode() [0] 
+    
+    # Display the most common month in word instead of number
+    if most_common_month ==1:
+        most_common_month = 'January'
+    elif most_common_month ==2:
+        most_common_month = 'February'
+    elif most_common_month ==3:
+        most_common_month = 'March'
+    elif most_common_month ==4:
+        most_common_month = 'April'
+    elif most_common_month ==5:
+        most_common_month = 'May'
+    elif most_common_month ==6:
+        most_common_month = 'June'
+    elif most_common_month ==7:
+        most_common_month = 'July'
+    elif most_common_month ==8:
+        most_common_month = 'August'
+    elif most_common_month ==9:
+        most_common_month = 'September'
+    elif most_common_month ==10:
+        most_common_month='October'
+    elif most_common_month ==11:
+        most_common_month='November'
+    elif most_common_month ==12:
+        most_common_month = 'December'
+    
     print('Most common month: ',most_common_month)
 
     # Display the most common day of week
     most_common_weekday = df['Day of week'].mode()[0]
-    print('Most common day of the week: ', most_common_weekday)
+    
+    #Displays the most common day of week in word instead of number
+    if most_common_weekday==1:
+        most_common_weekday = 'Monday'
+    elif most_common_weekday ==2:
+        most_common_weekday = 'Tuesday'
+    elif most_common_weekday ==3:
+        most_common_weekday = 'Wednesday'
+    elif most_common_weekday ==4:
+        most_common_weekday = 'Thursday'
+    elif most_common_weekday ==5:
+        most_common_weekday = 'Friday'
+    elif most_common_weekday ==6:
+        most_common_weekday = 'Saturday'
+    elif most_common_weekday ==7:
+        most_common_weekday = 'Sunday'
         
+    print('Most common day of the week: ', most_common_weekday)
+  
     # Display the most common start hour
     most_common_start_hour = df['Hour'].mode()[0]
     print('Most commmon start time: ',most_common_start_hour,'h')
@@ -145,17 +188,24 @@ def trip_duration_stats(df):
 
     # Display total travel time
     total_travel_time = df['Trip Duration'].sum()
-    print('Total travel time: ', total_travel_time)
+    total_travel_time_seconds = total_travel_time%60
+    total_travel_time_minutes = total_travel_time//60%60
+    total_travel_time_hours = total_travel_time//3600%60
+    
+    print('Total travel time: ', round(total_travel_time_hours,2),' hours ',round(total_travel_time_minutes,2),' minutes ', round(total_travel_time_seconds,2),' seconds')
 
     # Display mean travel time
     mean_travel_time = df['Trip Duration'].mean()
-    print('Time travel mean: ', mean_travel_time)
+    mean_travel_time_seconds = mean_travel_time%60
+    mean_travel_time_minutes = mean_travel_time//60%60
+    mean_travel_time_hours = mean_travel_time//3600%60
+    print('Mean travel time: ', round(mean_travel_time_hours,2),' hours ',round(mean_travel_time_minutes,2),' minutes ', round(mean_travel_time_seconds,2),' seconds')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
 #USER STATS
-def user_stats(df):
+def user_stats(df,city):
     """Displays statistics on bikeshare users."""
 
     print('\nCalculating User Stats...\n')
@@ -166,24 +216,44 @@ def user_stats(df):
     print('Count of users inside each typology\n: ', users_count_per_type)
 
     # Display counts of gender
-    users_count_per_gender=df['Gender'].value_counts()
-    print('Count of users gender:\n', users_count_per_gender)
+    if city != 'washington':
+        users_count_per_gender=df['Gender'].value_counts()
+        print('Count of users gender:\n', users_count_per_gender)
 
-    # Display earliest birthday year.
-    earliest_birth_year=df['Birth Year'].min()
-    print('Earliest birth year:', int(earliest_birth_year))
+        # Display earliest birthday year.
+        earliest_birth_year=df['Birth Year'].min()
+        print('Earliest birth year:', int(earliest_birth_year))
+            
+        # Display most recent birthday year.
+        most_recent_birth_year=df['Birth Year'].max()
+        print('Most recent birth year', int(most_recent_birth_year))
+            
+        # Display most common birth year
+        most_common_birth_year= df['Birth Year'].mode()[0]
+        print('Most common birth year: ', int(most_common_birth_year))
         
-    # Display most recent birthday year.
-    most_recent_birth_year=df['Birth Year'].max()
-    print('Most recent birth year', int(most_recent_birth_year))
+    if city == 'washington':
+        print('DATABASE INFO: Washington does not have user stats data.')
         
-    # Display most common birth year
-    most_common_birth_year= df['Birth Year'].mode()[0]
-    print('Most common birth year: ', int(most_common_birth_year))
-
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
+def display_raw_data(df):
+    """ Your docstring here """
+    i = 0
+    raw = input("Would you like to see some data from the dataset? Type: Yes or No.").lower() # TO DO: convert the user input to lower case using lower() function
+    pd.set_option('display.max_columns',200)
+
+    while True:            
+        if raw == 'no':
+            break
+        elif raw == 'yes':
+            print(df.iloc[i]) # TO DO: appropriately subset/slice your dataframe to display next five rows
+            raw = input("Display 5 adittional lines. Type: Yes/No.").lower() # TO DO: convert the user input to lower case using lower() function
+            i += 5
+        else:
+            raw = input("\nYour input is invalid. Please enter only 'yes' or 'no'\n").lower()
+            
 def main():
 
     while True:
@@ -193,10 +263,11 @@ def main():
         time_stats(df)
         station_stats(df)
         trip_duration_stats(df)
-        user_stats(df)
+        user_stats(df,city)
+        display_raw_data(df)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
-        if restart.lower() != 'yes':
+        if restart.lower() != 'yes' and restart.lower()!='ye' and restart.lower() != 'y':
             break
 
 
